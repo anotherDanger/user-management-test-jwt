@@ -54,3 +54,26 @@ func (ctrl *UserControllerImpl) Register(w http.ResponseWriter, r *http.Request,
 	json.NewEncoder(w).Encode(helper.NewResponse(http.StatusCreated, "OK", response))
 
 }
+
+func (ctrl *UserControllerImpl) Login(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	var reqBody web.Request
+	json.NewDecoder(r.Body).Decode(&reqBody)
+
+	if reqBody.Username == "" || reqBody.Password == "" {
+		w.WriteHeader(400)
+		return
+	}
+
+	response, err := ctrl.svc.Login(r.Context(), &reqBody)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(400)
+		json.NewEncoder(w).Encode(helper.NewResponse(http.StatusBadRequest, "error", response))
+		helper.NewLoggerConfigure("controller.log", logrus.ErrorLevel, err.Error(), logrus.ErrorLevel)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(helper.NewResponse(200, "OK", response))
+}

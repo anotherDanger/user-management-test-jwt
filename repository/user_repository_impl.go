@@ -31,3 +31,16 @@ func (repo *UserRepositoryImpl) Register(ctx context.Context, sql *sql.Tx, entit
 
 	return &response, nil
 }
+
+func (repo *UserRepositoryImpl) Login(ctx context.Context, sql *sql.Tx, entity *domain.Domain) (*domain.Domain, error) {
+	var user domain.Domain
+	query := "select username, password from new_users where username = ?"
+	err := sql.QueryRowContext(ctx, query, entity.Username).Scan(&user.Username, &user.Password)
+	if err != nil {
+		helper.NewLoggerConfigure("user_repository.log", logrus.ErrorLevel, err.Error(), logrus.ErrorLevel)
+		return nil, err
+	}
+
+	return &user, nil
+
+}

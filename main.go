@@ -12,6 +12,7 @@ import (
 func NewRouter(ctrl controller.UserController) *httprouter.Router {
 	r := httprouter.New()
 	r.POST("/v1/register", ctrl.Register)
+	r.POST("/v1/login", ctrl.Login)
 
 	return r
 }
